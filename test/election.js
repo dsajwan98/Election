@@ -39,6 +39,46 @@ contract("Election", function(accounts){
         }).then(function(candidate){
             var voteCount = candidate[2];
             assert.equal(voteCount,1,"Increment the candidates vote count");
-        })
+        });
+    });
+
+    it("Throws exception for invalid candidates",function(){
+        return Election.deployed().then(function(instance){
+            electionInstance=instance;
+            return electionInstance.vote(99,{from:accounts[0]})
+        }).then(assert.fail).catch(function(error){
+            assert(error.message.indexOf('revert')>=0, "Error message must contain revert");
+            return electionInstance.candidates(1);
+        }).then(function(candidate1){
+            var voteCount = candidate1[2];
+            assert.equal(voteCount,1,"Candidate 1 did not get any vote");
+            return electionInstance.candidates(2);
+        }).then(function(candidate2){
+            var voteCount = candidate2[2];
+            assert.equal(voteCount,0,"Candidate 2 did not get any vote");
+        });
+    });
+
+    it("Throws an exception for casting double votes",function(){
+        Election.deployed().then(function(instance){
+            electionInstance = instance;
+            candidateId = 2;
+            electionInstance.vote(candidateId,{from:accounts[1]});
+            return electionInstance.candidates(candidateId);
+        }).then(function(candidate){
+            var voteCount = candidate[2];
+            assert.equal(voteCount,1,"Accepts first vote");
+            return electionInstance.candidates(candidateId);
+        }).then(assert.fail).catch(function(error){
+            assert(error.message.indexOf('revert')>=0, "Error message must contain revert");
+            return electionInstance.candidates(1);
+        }).then(function(candidate1){
+            var voteCount = candidate1[2];
+            assert.equal(voteCount,1,"Candidate 1 did not get any vote");
+            return electionInstance.candidates(2);
+        }).then(function(candidate2){
+            var voteCount = candidate2[2];
+            assert.equal(voteCount,0,"Candidate 2 did not get any vote");
+        });
     });
 });
