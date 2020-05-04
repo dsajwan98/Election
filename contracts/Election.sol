@@ -14,6 +14,11 @@ contract Election{
     //Store Candidate Count
     uint public candidatesCount;
 
+    // voted event
+    event votedEvent (
+        uint indexed _candidateId
+    );
+
     constructor() public{
         addCandidate("Candidate 1");
         addCandidate("Candidate 2");
@@ -29,6 +34,8 @@ contract Election{
         require(_candidateId > 0 && _candidateId <= candidatesCount);
         voters[msg.sender] = true; //Record if an account has voted
         candidates[_candidateId].voteCount ++; //Increase vote Count of Candidate
+        // trigger voted event
+        emit votedEvent(_candidateId);
     }
 
 }
