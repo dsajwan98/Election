@@ -30,8 +30,8 @@ contract Election{
     }
 
     function vote(uint _candidateId) public{
-        require(!voters[msg.sender]);
-        require(_candidateId > 0 && _candidateId <= candidatesCount);
+        require(!voters[msg.sender],"Must vote for one time only");
+        require(_candidateId > 0 && _candidateId <= candidatesCount,"Must be a valid Candidate");
         voters[msg.sender] = true; //Record if an account has voted
         candidates[_candidateId].voteCount ++; //Increase vote Count of Candidate
         // trigger voted event
